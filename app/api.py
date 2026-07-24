@@ -1,4 +1,7 @@
+import os
+
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -11,6 +14,14 @@ from app.services.flux import generate_image
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="LinkedIn AI Agent")
+
+# 1. Encontra a raiz do projeto (uma pasta acima de app/)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMAGES_DIR = os.path.join(BASE_DIR, "images")
+
+# 2. Garante que a pasta existe na raiz e a expõe na rota /images
+os.makedirs(IMAGES_DIR, exist_ok=True)
+app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
 class GenerateRequest(BaseModel):
     topic: str
@@ -28,9 +39,15 @@ def generate_post(request: GenerateRequest, db: Session = Depends(get_db)):
     image_path = None
     if generated_content.image:
         try:
+            # Salva no disco
             image_path = generate_image(generated_content.image)
-            # Substituímos o prompt pelo caminho do arquivo salvo para retornar no JSON
-            generated_content.image = image_path
+            
+            # Extrai o nome do arquivo e monta a URL interna
+            filename = os.path.basename(image_path)
+            image_url = f"http://api:8000/images/{filename}"
+            
+            # Devolve a URL para o n8n em vez do caminho do disco
+            generated_content.image = image_url
         except Exception as e:
             print(f"Aviso: Falha ao gerar imagem - {e}")
     
