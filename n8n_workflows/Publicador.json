@@ -1,0 +1,252 @@
+{
+  "name": "Publicador",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        -144
+      ],
+      "id": "5903acae-0c1d-4b33-944e-6e97c95aa820",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://api:8000/trends/pending",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -384,
+        0
+      ],
+      "id": "9148ed48-05fd-47a7-b082-7b02d3d0f9dd",
+      "name": "Busca Ideia"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "topic",
+              "value": "={{ $('Busca Ideia').item.json.tema }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -176,
+        0
+      ],
+      "id": "644b4810-e9a2-45f1-817e-1f8f445ff11f",
+      "name": "Gera Post"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "8220925058",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "806cbff1-c955-4555-83b1-5ffdc7573d0e",
+      "name": "Send a photo message",
+      "webhookId": "a39a60ec-b911-437d-9010-108b4f35c34a",
+      "credentials": {
+        "telegramApi": {
+          "id": "7bZbAeyNcW09VCw8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Gera Post').item.json.image }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        0
+      ],
+      "id": "3c35885c-6f99-4c8c-9ed6-38fa1baebd48",
+      "name": "Baixa Imagem"
+    },
+    {
+      "parameters": {
+        "chatId": "8220925058",
+        "text": "=*Novo Post - {{ $now.toFormat('dd/MM/yyyy') }}*\n\n*{{ $('Gera Post').item.json.title }}*\n\n{{ $('Gera Post').item.json.post }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Aprovar ✅",
+                    "additionalFields": {
+                      "callback_data": "=aprovar_{{ $('Busca Ideia').item.json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Regerar 🔄",
+                    "additionalFields": {
+                      "callback_data": "=regerar_{{ $('Busca Ideia').item.json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Cancelar ❌",
+                    "additionalFields": {
+                      "callback_data": "=cancelar_{{ $('Busca Ideia').item.json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "52a1e576-1713-4f72-8fac-d1830e4eba00",
+      "name": "Send a text message",
+      "webhookId": "726004c7-b596-4d9e-aa12-588384193c2c",
+      "credentials": {
+        "telegramApi": {
+          "id": "7bZbAeyNcW09VCw8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        0
+      ],
+      "id": "85cb001c-f45e-4ca6-94c5-5a726dfcf45c",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Busca Ideia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Ideia": {
+      "main": [
+        [
+          {
+            "node": "Gera Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gera Post": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baixa Imagem": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message": {
+      "main": [
+        []
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Baixa Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Busca Ideia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "481e9bc9-1714-430e-9c81-a3c639c4e927",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d16dd51ce8268ac808a84329661113301200f370a379ab7a5f206b597be191da"
+  },
+  "nodeGroups": [],
+  "id": "WZWprauPT6oMrBuv",
+  "tags": []
+}

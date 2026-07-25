@@ -1,0 +1,65 @@
+{
+  "name": "Gerador Ideias",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "acb7a20c-2196-4567-91b3-2207edd2b412",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/trends/capture",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7cea58be-d9e6-4c63-adad-85d6fc008511",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f12b1a2e-7544-47af-9649-c3d81807c691",
+  "meta": {
+    "instanceId": "d16dd51ce8268ac808a84329661113301200f370a379ab7a5f206b597be191da"
+  },
+  "nodeGroups": [],
+  "id": "2PcQw7MueehJVepq",
+  "tags": []
+}

@@ -12,8 +12,8 @@ class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
-    topic = Column(String(100), nullable=False)
+    title = Column(Text, nullable=False)
+    topic = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
     image_path = Column(String(500), nullable=True)
     status = Column(String(50), default="draft", nullable=False)
@@ -32,6 +32,17 @@ class Post(Base):
         CheckConstraint('comments >= 0', name='check_comments_positive'),
         CheckConstraint('views >= 0', name='check_views_positive'),
     )
+
+class IdeiaTrend(Base):
+    __tablename__ = "ideias_trends"
+
+    id = Column(Integer, primary_key=True, index=True)
+    titulo_noticia = Column(String, nullable=False) # A manchete que puxamos
+    link_noticia = Column(String, nullable=False) # Para você ler se quiser
+    tema_gerado = Column(Text, nullable=False) # O tópico genial criado pelo Gemini
+    status = Column(String, default="pendente") # "pendente", "usado", "descartado"
+    data_captura = Column(DateTime, default=datetime.utcnow)
+
 
 # ==========================================
 # SCHEMAS PYDANTIC (Validação da API)

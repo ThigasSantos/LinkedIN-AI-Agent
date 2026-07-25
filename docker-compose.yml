@@ -41,7 +41,7 @@ services:
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - TZ=America/Sao_Paulo
-    volumes:
+      - WEBHOOK_URL=https://8935fbecb5f7c0.lhr.life
       - n8n_data:/home/node/.n8n
     depends_on:
       - api

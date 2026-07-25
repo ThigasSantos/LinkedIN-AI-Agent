@@ -1,21 +1,22 @@
 import os
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException 
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from app.database.connection import engine, Base, get_db
-from app.models.post import Post, PostGenerateResponse
+from app.models.post import Post, PostGenerateResponse, IdeiaTrend
 from app.services.gemini import generate_linkedin_post
 from app.services.flux import generate_image
+from app.services.trends import capture_and_generate_trend 
 
 # Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="LinkedIn AI Agent")
 
-# 1. Encontra a raiz do projeto (uma pasta acima de app/)
+# 1. Encontra a raiz do projeto 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
 
@@ -51,7 +52,7 @@ def generate_post(request: GenerateRequest, db: Session = Depends(get_db)):
         except Exception as e:
             print(f"Aviso: Falha ao gerar imagem - {e}")
     
-    # 3. Salva no banco de dados (agora com o caminho da imagem)
+    # 3. Salva no banco de dados 
     novo_post = Post(
         title=generated_content.title,
         topic=request.topic,
@@ -63,5 +64,49 @@ def generate_post(request: GenerateRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(novo_post)
     
-    # 4. Retorna para a interface (n8n no futuro)
+    # 4. Retorna para a interface 
     return generated_content
+
+# ---  ENDPOINT DE TRENDS  ---
+
+@app.post("/trends/capture", summary="Captura notícias do dia e gera uma ideia de post")
+def capture_trends(db: Session = Depends(get_db)):
+    try:
+        nova_ideia = capture_and_generate_trend(db)
+        return {
+            "message": "Nova ideia de trend capturada com sucesso!",
+            "noticia_base": nova_ideia.titulo_noticia,
+            "link_referencia": nova_ideia.link_noticia,
+            "ideia_gerada": nova_ideia.tema_gerado
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/trends/pending", summary="Busca a ideia mais antiga que ainda está pendente")
+def get_pending_trend(db: Session = Depends(get_db)):
+    # Busca o primeiro registro onde o status é 'pendente', ordenado pela data mais antiga
+    ideia = db.query(IdeiaTrend).filter(IdeiaTrend.status == "pendente").order_by(IdeiaTrend.data_captura.asc()).first()
+    
+    if not ideia:
+        raise HTTPException(status_code=404, detail="Nenhuma ideia pendente encontrada na fila.")
+        
+    return {
+        "id": ideia.id,
+        "tema": ideia.tema_gerado,
+        "noticia_base": ideia.titulo_noticia
+    }
+
+class UpdateStatusRequest(BaseModel):
+    status: str
+
+@app.put("/trends/{ideia_id}/status", summary="Atualiza o status de uma ideia (ex: usado, descartado)")
+def update_trend_status(ideia_id: int, request: UpdateStatusRequest, db: Session = Depends(get_db)):
+    ideia = db.query(IdeiaTrend).filter(IdeiaTrend.id == ideia_id).first()
+    
+    if not ideia:
+        raise HTTPException(status_code=404, detail="Ideia não encontrada.")
+        
+    ideia.status = request.status
+    db.commit()
+    
+    return {"message": f"Status da ideia {ideia_id} atualizado para '{request.status}'"}
