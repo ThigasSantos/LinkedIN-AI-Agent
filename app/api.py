@@ -92,8 +92,41 @@ def get_pending_trend(db: Session = Depends(get_db)):
         
     return {
         "id": ideia.id,
-        "tema": ideia.tema_gerado,
+        "topic": ideia.tema_gerado,
         "noticia_base": ideia.titulo_noticia
+    }
+
+@app.get("/trends/{ideia_id}", summary="Busca uma ideia específica pelo ID")
+def get_trend_by_id(ideia_id: int, db: Session = Depends(get_db)):
+    ideia = db.query(IdeiaTrend).filter(IdeiaTrend.id == ideia_id).first()
+    
+    if not ideia:
+        raise HTTPException(status_code=404, detail="Ideia não encontrada.")
+        
+    return {
+        "id": ideia.id,
+        "topic": ideia.tema_gerado,
+        "noticia_base": ideia.titulo_noticia
+    }
+
+@app.get("/posts/latest", summary="Busca o post mais recente de um tópico específico")
+def get_latest_post_by_topic(topic: str, db: Session = Depends(get_db)):
+    # Busca o último post gerado com esse tópico
+    post = db.query(Post).filter(Post.topic == topic).order_by(Post.id.desc()).first()
+    
+    if not post:
+        raise HTTPException(status_code=404, detail="Post não encontrado para este tópico")
+        
+    # Reconstrói a URL da imagem para o n8n conseguir baixar
+    image_url = None
+    if post.image_path:
+        filename = os.path.basename(post.image_path)
+        image_url = f"http://api:8000/images/{filename}"
+        
+    return {
+        "title": post.title,
+        "content": post.content,
+        "image_url": image_url
     }
 
 class UpdateStatusRequest(BaseModel):

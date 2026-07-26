@@ -4,6 +4,7 @@ services:
   api:
     build: .
     container_name: linkedin_api
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
@@ -36,12 +37,16 @@ services:
       retries: 5
   n8n:
     image: docker.n8n.io/n8nio/n8n
+    restart: unless-stopped
     ports:
       - "5678:5678"
     environment:
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - TZ=America/Sao_Paulo
-      - WEBHOOK_URL=https://8935fbecb5f7c0.lhr.life
+      - WEBHOOK_URL=https://mouse-cycle-emcee.ngrok-free.dev
+      - N8N_PROXY_HOPS=1
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+    volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
       - api

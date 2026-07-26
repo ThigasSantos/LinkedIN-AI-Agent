@@ -6,6 +6,8 @@ Diretrizes para o post:
 - Utilize parágrafos curtos para facilitar a leitura.
 - Inclua um gancho (hook) forte na primeira linha.
 - Finalize com uma chamada para ação (CTA) que estimule comentários.
+- Escreva o título do post exclusivamente em letras MAIÚSCULAS (Caixa Alta) e inicie com um emoji que represente o tema (ex: 🚀, 💡, 📊).
+- IMPORTANTE: Não utilize nenhuma formatação markdown (como ** ou *) em nenhuma parte do texto ou do título. Entregue o texto em formato plano e limpo.
 
 Ao final do post, adicione entre 3 a 5 hashtags altamente estratégicas e focadas em engajamento no LinkedIn. 
 Regras para as hashtags:

@@ -14,10 +14,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -592,
-        -144
+        0,
+        0
       ],
-      "id": "5903acae-0c1d-4b33-944e-6e97c95aa820",
+      "id": "7d2d4782-3b8c-4120-a1ee-e86c2b525176",
       "name": "Schedule Trigger"
     },
     {
@@ -28,10 +28,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -384,
-        0
+        208,
+        144
       ],
-      "id": "9148ed48-05fd-47a7-b082-7b02d3d0f9dd",
+      "id": "9864c6c7-0c71-4fdf-96d2-d6f24570b9df",
       "name": "Busca Ideia"
     },
     {
@@ -43,7 +43,7 @@
           "parameters": [
             {
               "name": "topic",
-              "value": "={{ $('Busca Ideia').item.json.tema }}"
+              "value": "={{ $('Dados Base').item.json.topic }}"
             }
           ]
         },
@@ -52,10 +52,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -176,
-        0
+        624,
+        144
       ],
-      "id": "644b4810-e9a2-45f1-817e-1f8f445ff11f",
+      "id": "6d84f875-ded3-43b8-87ba-3dae37b58113",
       "name": "Gera Post"
     },
     {
@@ -68,15 +68,15 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        384,
-        0
+        1184,
+        144
       ],
-      "id": "806cbff1-c955-4555-83b1-5ffdc7573d0e",
+      "id": "9f07a574-0dfc-4bd9-a976-e236042ea58d",
       "name": "Send a photo message",
       "webhookId": "a39a60ec-b911-437d-9010-108b4f35c34a",
       "credentials": {
         "telegramApi": {
-          "id": "7bZbAeyNcW09VCw8",
+          "id": "WmmpjhZNk4hKx3YQ",
           "name": "Telegram account"
         }
       }
@@ -89,10 +89,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        192,
-        0
+        992,
+        144
       ],
-      "id": "3c35885c-6f99-4c8c-9ed6-38fa1baebd48",
+      "id": "bae5fb6c-9db5-431e-98eb-1b4b354dc7e9",
       "name": "Baixa Imagem"
     },
     {
@@ -108,19 +108,19 @@
                   {
                     "text": "Aprovar ✅",
                     "additionalFields": {
-                      "callback_data": "=aprovar_{{ $('Busca Ideia').item.json.id }}"
+                      "callback_data": "=aprovar_{{ $('Dados Base').item.json.id }}"
                     }
                   },
                   {
                     "text": "Regerar 🔄",
                     "additionalFields": {
-                      "callback_data": "=regerar_{{ $('Busca Ideia').item.json.id }}"
+                      "callback_data": "=regerar_{{ $('Dados Base').item.json.id }}"
                     }
                   },
                   {
                     "text": "Cancelar ❌",
                     "additionalFields": {
-                      "callback_data": "=cancelar_{{ $('Busca Ideia').item.json.id }}"
+                      "callback_data": "=cancelar_{{ $('Dados Base').item.json.id }}"
                     }
                   }
                 ]
@@ -136,15 +136,15 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        16,
-        0
+        816,
+        144
       ],
-      "id": "52a1e576-1713-4f72-8fac-d1830e4eba00",
+      "id": "eb737669-b38a-45b5-a96e-6d4134e517ca",
       "name": "Send a text message",
       "webhookId": "726004c7-b596-4d9e-aa12-588384193c2c",
       "credentials": {
         "telegramApi": {
-          "id": "7bZbAeyNcW09VCw8",
+          "id": "WmmpjhZNk4hKx3YQ",
           "name": "Telegram account"
         }
       }
@@ -154,12 +154,64 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -592,
-        0
+        0,
+        144
       ],
-      "id": "85cb001c-f45e-4ca6-94c5-5a726dfcf45c",
+      "id": "2ccfc245-d196-496e-9a34-0d8fb24d9561",
       "name": "When clicking ‘Execute workflow’",
       "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef1b26ac-3015-4efc-89d5-e4e34c1dc90f",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "74393026-55ef-416a-90b6-663b43a05e96",
+              "name": "topic",
+              "value": "={{ $json.topic }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        144
+      ],
+      "id": "4a2be547-8781-42b3-88ed-b34749b5c668",
+      "name": "Dados Base"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id",
+              "type": "number"
+            },
+            {
+              "name": "topic"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        352
+      ],
+      "id": "f2681630-c54c-4773-bb84-033491e0629d",
+      "name": "When Executed by Another Workflow"
     }
   ],
   "pinData": {},
@@ -179,7 +231,7 @@
       "main": [
         [
           {
-            "node": "Gera Post",
+            "node": "Dados Base",
             "type": "main",
             "index": 0
           }
@@ -208,11 +260,6 @@
         ]
       ]
     },
-    "Send a photo message": {
-      "main": [
-        []
-      ]
-    },
     "Send a text message": {
       "main": [
         [
@@ -234,19 +281,42 @@
           }
         ]
       ]
+    },
+    "Dados Base": {
+      "main": [
+        [
+          {
+            "node": "Gera Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Dados Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "481e9bc9-1714-430e-9c81-a3c639c4e927",
+  "versionId": "db79029f-95a3-4a01-bdce-f17a0ce798aa",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "d16dd51ce8268ac808a84329661113301200f370a379ab7a5f206b597be191da"
+    "instanceId": "1e9244d7368ec3726b6135b91e54715a83174355774b490fb0ed6c1b347f6cd9"
   },
   "nodeGroups": [],
-  "id": "WZWprauPT6oMrBuv",
+  "id": "b86wAeOyK85XrExR",
   "tags": []
 }

@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Pastas de banco de dados e arquivos locais
+postgres_data/
+n8n_data/
+__pycache__/
+*.pyc
+
+# Pasta de imagens geradas (opcional, para não pesar o repositório)
+images/
