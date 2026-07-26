@@ -1,0 +1,612 @@
+{
+  "name": "Ouvinte",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        -48
+      ],
+      "id": "3f3b8604-48a2-45fa-84a8-e996d98587dc",
+      "name": "Telegram Trigger",
+      "webhookId": "6126a864-1bc9-45a2-a1be-5886f5301df4",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data.split('_')[0] }}",
+                    "rightValue": "aprovar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0881bd74-30c9-4e13-bad4-3a32952e0ea4"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9dc45593-1eaa-4816-ba57-82b76c245642",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data.split('_')[0] }}",
+                    "rightValue": "cancelar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "99816cd0-4b3d-400b-ae1d-5ad45027bdb2",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data.split('_')[0] }}",
+                    "rightValue": "regerar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        -64
+      ],
+      "id": "6ea91a68-b46d-4adb-921a-872f780a4eb8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=http://api:8000/trends/{{ $('Telegram Trigger').item.json.callback_query.data.split('_')[1] }}/status",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"status\": \"descartado\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        128,
+        -48
+      ],
+      "id": "4b728820-af8a-40a7-9bcb-612c29df9a7e",
+      "name": "Cancelar"
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Telegram Trigger').item.json.callback_query.id }}",
+        "additionalFields": {
+          "show_alert": true,
+          "text": "❌ Post Descartado!"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -48
+      ],
+      "id": "8b923128-7b8b-45fa-9e46-c8dcd1fc3e13",
+      "name": "Resposta Descartado",
+      "webhookId": "d81279c2-9bc4-4565-ba57-fa17bcf89d49",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}",
+        "replyMarkup": "inlineKeyboard",
+        "text": "={{ $('Telegram Trigger').item.json.callback_query.message.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "00035102-3a72-4d3b-a797-ef19949e68cd",
+      "name": "Edit a text message",
+      "webhookId": "80436c57-9e39-4e85-8b9d-cf2a524ebce9",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=http://api:8000/trends/{{ $('Telegram Trigger').item.json.callback_query.data.split('_')[1] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        320,
+        144
+      ],
+      "id": "eb6f8ba0-75f8-4225-ad33-f64db871c1cc",
+      "name": "Busca Topico"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "b86wAeOyK85XrExR",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/b86wAeOyK85XrExR",
+          "cachedResultName": "Publicador"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Busca Topico').item.json.id }}",
+            "topic": "={{ $('Busca Topico').item.json.topic }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        144
+      ],
+      "id": "375b4d3d-b80f-4d38-b76e-e012d5095529",
+      "name": "Call 'Publicador'"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}",
+        "replyMarkup": "inlineKeyboard",
+        "text": "={{ $('Telegram Trigger').item.json.callback_query.message.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        144
+      ],
+      "id": "1bc769ea-ed4e-46cf-b8ea-158723d647b8",
+      "name": "Edit a text message1",
+      "webhookId": "3c5efff5-b0fa-46d6-83fb-acdd7b86d113",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Telegram Trigger').item.json.callback_query.id }}",
+        "additionalFields": {
+          "show_alert": true,
+          "text": "🔄 Regerando post, aguarde uns segundos..."
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        144
+      ],
+      "id": "94197ef1-da43-4725-b3ca-a1b3d8d9b9e0",
+      "name": "Resposta Regerar",
+      "webhookId": "9db904d8-1b70-45c7-86fd-f8510dbfbc48",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}",
+        "replyMarkup": "inlineKeyboard",
+        "text": "={{ $('Telegram Trigger').item.json.callback_query.message.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -240
+      ],
+      "id": "a8e97de2-de47-42a8-bad6-7f392ea137d8",
+      "name": "Edit a text message2",
+      "webhookId": "d42c71ce-63e8-48e2-b7df-735183c99610",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $('Telegram Trigger').item.json.callback_query.id }}",
+        "additionalFields": {
+          "show_alert": true,
+          "text": "✅ Aprovado! Publicando no LinkedIn..."
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        -240
+      ],
+      "id": "66f9b4db-80c7-40d5-9322-c608ced9c2fe",
+      "name": "Resposta Aprovar",
+      "webhookId": "7ef0d557-c63b-4150-85ac-bae5bab8d131",
+      "credentials": {
+        "telegramApi": {
+          "id": "WmmpjhZNk4hKx3YQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=http://api:8000/trends/{{ $('Telegram Trigger').item.json.callback_query.data.split('_')[1] }}/status",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"status\": \"usado\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        752,
+        -240
+      ],
+      "id": "d0bd1d4a-ae36-4ca4-bcab-505f0b5f82ba",
+      "name": "Usado"
+    },
+    {
+      "parameters": {
+        "url": "=http://api:8000/trends/{{ $('Telegram Trigger').item.json.callback_query.data.split('_')[1] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -240
+      ],
+      "id": "651e4a88-6690-444e-9a52-554b97a0c4d2",
+      "name": "Topico"
+    },
+    {
+      "parameters": {
+        "url": "http://api:8000/posts/latest",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "topic",
+              "value": "={{ $('Topico').item.json.topic }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        960,
+        -240
+      ],
+      "id": "f9a48a66-3162-4e0d-8c83-a840658d3826",
+      "name": "Busca Post"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Busca Post').item.json.image_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1168,
+        -240
+      ],
+      "id": "7e54e00c-65bc-4dab-8d78-353e9da6a13d",
+      "name": "Baixa Imagem"
+    },
+    {
+      "parameters": {
+        "person": "6fffyxmQCq",
+        "text": "={{ $('Busca Post').item.json.content }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        -240
+      ],
+      "id": "2dec75aa-85e8-48e9-8180-5895f99ddbba",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "wqMTyobHzLnD9CoV",
+          "name": "LinkedIn account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Resposta Aprovar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cancelar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resposta Regerar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancelar": {
+      "main": [
+        [
+          {
+            "node": "Resposta Descartado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resposta Descartado": {
+      "main": [
+        [
+          {
+            "node": "Edit a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Topico": {
+      "main": [
+        [
+          {
+            "node": "Edit a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit a text message1": {
+      "main": [
+        [
+          {
+            "node": "Call 'Publicador'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resposta Regerar": {
+      "main": [
+        [
+          {
+            "node": "Busca Topico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resposta Aprovar": {
+      "main": [
+        [
+          {
+            "node": "Edit a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit a text message2": {
+      "main": [
+        [
+          {
+            "node": "Topico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Topico": {
+      "main": [
+        [
+          {
+            "node": "Usado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Usado": {
+      "main": [
+        [
+          {
+            "node": "Busca Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Post": {
+      "main": [
+        [
+          {
+            "node": "Baixa Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baixa Imagem": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "10250845-c3ea-46a2-9cbc-d42ec6fddd61",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1e9244d7368ec3726b6135b91e54715a83174355774b490fb0ed6c1b347f6cd9"
+  },
+  "nodeGroups": [],
+  "id": "MJIqR8UszxIOGkjS",
+  "tags": []
+}
